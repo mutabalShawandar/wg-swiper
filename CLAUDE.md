@@ -31,6 +31,13 @@ When the user says "work on X" / names tasks:
 6. The orchestrating session reviews both PRs, merges them to `main` one at a time (rebase the second on the updated `main`), runs checks on `main`, then cleans up worktrees/branches.
 7. DB ↔ mobile contract: DB tasks end by regenerating types and documenting RPC signatures in `docs/api.md`; mobile tasks code against that doc.
 
+## Team knowledge (`.agents/`)
+- Agents are a team. `.agents/` (see `.agents/README.md`) is the shared memory: `features/`, `changes/`, `fixes/`, `guides/`, `decisions/`, indexed in `.agents/INDEX.md`.
+- **Start of every task:** read `.agents/INDEX.md` and the entries for your area; check `gh pr list` for overlapping work. Reuse, don't rebuild. Overlap or conflict → stop and tell the orchestrator.
+- **End of every task:** commit one entry (`.agents/<type>/YYYY-MM-DD-<branch-slug>.md`, from `.agents/templates/entry.md`) on your branch, covering what was built and where, how to use it, decisions, contracts others depend on, and what is unverified or not done.
+- Task branches never edit `INDEX.md`; the orchestrator adds the index line when merging. The entry is reviewed in the security gate (no secrets).
+- Every agent prompt the orchestrator writes must include these two rules and tell agents who their teammates are, what folders they own, and what they must not touch.
+
 ## Security review gate
 - Applies to **every task, every PR**, including docs and config changes (they can leak secrets or widen permissions).
 - The reviewer is a **separate agent from the one that wrote the code** (fresh context, never self-review). It audits the branch diff against `main` plus any code it touches.
@@ -65,7 +72,7 @@ When the user says "work on X" / names tasks:
 - Sign in with Apple must exist if any other social login exists.
 
 ## Definition of done
-A security specialist agent reviewed the final commit and reported **SAFE**; lint, typecheck, unit tests, and pgTAP tests pass; DE and EN strings present; RLS verified for any new table; docs updated (`docs/api.md` or PLAN); PR description says what changed and how to test.
+A `.agents/` entry is committed; a security specialist agent reviewed the final commit and reported **SAFE**; lint, typecheck, unit tests, and pgTAP tests pass; DE and EN strings present; RLS verified for any new table; docs updated (`docs/api.md` or PLAN); PR description says what changed and how to test.
 
 ## Useful commands (fill in as scaffolding lands)
 ```
