@@ -2,7 +2,7 @@
 title: Supabase local setup, base profiles migration, RLS test
 type: feature
 branch: feat/supabase-local-setup
-pr: PRURL
+pr: https://github.com/mutabalShawandar/wg-swiper/pull/3
 status: done
 date: 2026-11-04
 ---
