@@ -27,8 +27,18 @@ When the user says "work on X" / names tasks:
 2. Spawn **2 agents**, each with `isolation: "worktree"` on its own branch. Give each a self-contained prompt: goal, branch name, allowed folders, acceptance criteria, and these rules.
 3. Agents work only inside their own worktree and allowed folders. They must not edit shared root files (root `package.json`, CI, navigation root, `CLAUDE.md`) unless the task is explicitly about them. If they need such a change, report it instead.
 4. Each agent finishes with: lint + typecheck + tests green, committed, pushed, PR opened against `main`.
-5. The orchestrating session reviews both PRs, merges them to `main` one at a time (rebase the second on the updated `main`), runs checks on `main`, then cleans up worktrees/branches.
-6. DB ↔ mobile contract: DB tasks end by regenerating types and documenting RPC signatures in `docs/api.md`; mobile tasks code against that doc.
+5. **Security gate (mandatory):** a task is NOT finished until a separate **security specialist agent** has reviewed the task's diff and explicitly reported it **safe**. See "Security review gate" below. No safe verdict = no merge.
+6. The orchestrating session reviews both PRs, merges them to `main` one at a time (rebase the second on the updated `main`), runs checks on `main`, then cleans up worktrees/branches.
+7. DB ↔ mobile contract: DB tasks end by regenerating types and documenting RPC signatures in `docs/api.md`; mobile tasks code against that doc.
+
+## Security review gate
+- Applies to **every task, every PR**, including docs and config changes (they can leak secrets or widen permissions).
+- The reviewer is a **separate agent from the one that wrote the code** (fresh context, never self-review). It audits the branch diff against `main` plus any code it touches.
+- It checks at least: secrets or keys in code/history/config, RLS and policies on new or changed tables, `security definer` functions (`search_path`), input validation, auth/session handling, storage policies, exposure of other users' personal data (location, birthdate, email), dependency risk, MCP/CI permission scope, and GDPR/store-policy impact. Supabase advisors (security) must show no new findings for DB tasks.
+- The reviewer must end with an explicit verdict: **SAFE** or **NOT SAFE** with a findings list (severity, file:line, fix).
+- NOT SAFE → the author fixes on the same branch → a fresh review runs again. Repeat until SAFE. Findings are never waived silently; accepting a risk needs the user's explicit OK, recorded in the PR.
+- The SAFE verdict is pasted into the PR description (reviewed commit SHA included). Any new commit after the verdict invalidates it and requires re-review.
+- The orchestrator must not merge, and must not report a task as done to the user, without a SAFE verdict for the current head commit.
 
 ## Supabase workflow
 - Start local stack: `supabase start` (Docker must be running). Reset with seed: `supabase db reset`.
@@ -55,7 +65,7 @@ When the user says "work on X" / names tasks:
 - Sign in with Apple must exist if any other social login exists.
 
 ## Definition of done
-Lint, typecheck, unit tests, and pgTAP tests pass; DE and EN strings present; RLS verified for any new table; docs updated (`docs/api.md` or PLAN); PR description says what changed and how to test.
+A security specialist agent reviewed the final commit and reported **SAFE**; lint, typecheck, unit tests, and pgTAP tests pass; DE and EN strings present; RLS verified for any new table; docs updated (`docs/api.md` or PLAN); PR description says what changed and how to test.
 
 ## Useful commands (fill in as scaffolding lands)
 ```
