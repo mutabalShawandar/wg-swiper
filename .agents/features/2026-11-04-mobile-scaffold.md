@@ -2,7 +2,7 @@
 title: Mobile app scaffold (Expo + Router + i18n + theme)
 type: feature
 branch: feat/mobile-scaffold
-pr: PR_URL_PLACEHOLDER
+pr: https://github.com/mutabalShawandar/wg-swiper/pull/4
 status: done
 date: 2026-11-04
 ---
