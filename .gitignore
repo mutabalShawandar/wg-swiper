@@ -1,0 +1,14 @@
+node_modules/
+.expo/
+dist/
+build/
+ios/
+android/
+.env
+.env.*
+!.env.example
+supabase/.branches/
+supabase/.temp/
+*.log
+.DS_Store
+.claude/settings.local.json
