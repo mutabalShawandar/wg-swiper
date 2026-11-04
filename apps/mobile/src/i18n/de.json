@@ -1,0 +1,11 @@
+{
+  "common": { "comingSoon": "Demnächst verfügbar" },
+  "tabs": {
+    "discover": "Entdecken",
+    "matches": "Matches",
+    "chat": "Chat",
+    "profile": "Profil",
+    "settings": "Einstellungen"
+  },
+  "auth": { "title": "Anmelden" }
+}
